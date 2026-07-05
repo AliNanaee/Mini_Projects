@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>rock paper scissors</title>
+  <style>
+    body {
+      background-color: rgb(25, 25, 25) ;
+      color: white;
+      font-family: arial;
+      font-size: 18px;
+    }
+    .icon-shape {
+      height: 50px;
+    }
+    .pick-button {
+      background-color: transparent;
+      height: 120px;
+      width: 120px;
+      border-radius: 60px;
+      margin-right: 10px;
+      margin-bottom: 30px;
+      border: 3px solid white;
+      cursor: pointer;
+    }
+    .result {
+      font-size: 25px;
+      font-weight: bold;
+    }
+    .jsmoves-pos {
+      margin-bottom: 50px;
+    }
+    .reset, .auto-play-button {
+      border: none;
+      padding: 10px 16px;
+      background-color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rock Paper Scissors</h1>
+
+  <br>
+
+  <button 
+    class="pick-button js-rock-button"><img src="rock-emoji.png" class="icon-shape">
+  </button>
+
+  <button 
+    class="pick-button js-paper-button"><img src="paper-emoji.png" class="icon-shape">
+  </button>
+
+  <button
+    class="pick-button js-scissors-button"><img src="scissors-emoji.png" class="icon-shape">
+  </button>
+
+  <p class="jsResult result"></p>
+  <p class="jsMoves jsmoves-pos"></p>
+  <p class="jsScore">win: 0 tie: 0 lose: 0</p>
+
+  <button onclick="
+    scores.wins = 0;
+    scores.tie = 0;
+    scores.losses = 0;
+    localStorage.removeItem('score');
+    updateScoreElement()
+    " class="reset">
+    Reset score
+  </button>
+  <button onclick="autoplay()" class="auto-play-button">Auto Play</button>
+
+  <script>
+    document.querySelector('.js-rock-button').addEventListener('click', () => {playGame('rock')});
+    document.querySelector('.js-paper-button').addEventListener('click', () => {playGame('paper')});
+    document.querySelector('.js-scissors-button').addEventListener('click', () => {playGame('scissors')});
+
+    document.body.addEventListener('keydown', (event) => {
+      if(event.key === 'r') {
+        playGame('rock');
+      }
+      else if (event.key === 'p') {
+        playGame('paper');
+      }
+      else if (event.key === 's') {
+        playGame('scissors');
+      }
+    });
+
+    let scores = JSON.parse(localStorage.getItem('score')) || 
+       {
+        wins : 0,
+        tie : 0,
+        losses : 0
+      };
+    
+    updateScoreElement()
+
+
+    let autoplaycheck = false;
+    let intervalId;
+    function autoplay() {
+      if (!autoplaycheck) {
+        let playermove;
+        intervalId = setInterval(() => {
+          playermove =pickpcmove();
+          playGame(playermove);
+        }, 1000)
+        autoplaycheck = true;
+      }
+      else {
+        clearInterval(intervalId);
+        autoplaycheck = false;
+      }
+    } 
+    
+    function playGame(playermove) {
+      
+      const pcmove = pickpcmove();
+      let result = '';
+
+      if (playermove === 'scissors') {
+        if (pcmove === 'rock') {
+          result = 'You lost';
+        }
+        else if (pcmove === 'paper') {
+          result = 'You won';
+        }
+        else {
+          result = 'Tie';
+        }
+      }
+      else if (playermove === 'paper') {
+        if (pcmove === 'rock') {
+          result = 'You won';
+        }
+        else if (pcmove === 'paper') {
+          result = 'Tie';
+        }
+        else {
+          result = 'You lost';
+        }
+      }
+      else {
+        if (pcmove === 'rock') {
+          result = 'tie';
+        }
+        else if (pcmove === 'paper') {
+          result = 'You lost';
+        }
+        else {
+          result = 'You won';
+        }
+      }
+
+      if (result === 'You won') {
+        scores.wins += 1;
+      }
+      else if (result === "You lost") {
+        scores.losses += 1;
+      }
+      else {
+        scores.tie += 1;
+      }
+
+      localStorage.setItem('score', JSON.stringify(scores));
+      
+      document.querySelector('.jsResult').innerHTML= result;
+
+      document.querySelector('.jsMoves').innerHTML = `you <img src="${playermove}-emoji.png" class="icon-shape">  <img src="${pcmove}-emoji.png" class="icon-shape"> computer` 
+
+      updateScoreElement()
+
+    }
+    
+    function updateScoreElement() {
+      document.querySelector('.jsScore').innerHTML = `win: ${scores.wins} tie: ${scores.tie} lose: ${scores.losses}`
+    }
+
+    function pickpcmove() {
+      
+      const randnum = Math.random();
+      let pcchoice = '';
+
+      if (randnum>=0 && randnum<1/3){
+        pcchoice = 'rock';
+        console.log('rock');
+      }
+      else if (randnum>=1/3 && randnum<2/3){
+        pcchoice = 'paper';
+        console.log('paper');
+      }
+      else {
+        pcchoice = 'Scissors';
+        console.log('scissors');
+      }
+      return pcchoice;
+    }
+
+  </script>
+</body>
+</html>
+</body>
+</html>
